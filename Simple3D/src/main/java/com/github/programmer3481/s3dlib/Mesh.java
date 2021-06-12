@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import org.joml.Vector3f;
 import org.joml.Vector2f;
+import org.joml.Math;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
@@ -134,24 +135,36 @@ public class Mesh {
         return ibo;
     }
 
-    public Mesh Cube() {
+    public Mesh plane(float x, float y) {
         return new Mesh(new Vertex[] {
-            new Vertex(new Vector3f(-1.0f, -1.0f, -1.0f), new Vector2f(1.0f, 2.0f/4)), //v0
-            new Vertex(new Vector3f(1.0f, -1.0f, -1.0f), new Vector2f(2.0f/3, 2.0f/4)), //v1
-            new Vertex(new Vector3f(1.0f, 1.0f, -1.0f), new Vector2f(2.0f/3, 3.0f/4)), //v2
-            new Vertex(new Vector3f(-1.0f, 1.0f, -1.0f), new Vector2f(1.0f, 3.0f/4)), //v3
-            new Vertex(new Vector3f(-1.0f, -1.0f, 1.0f), new Vector2f(0.0f, 2.0f/4)), //v4
-            new Vertex(new Vector3f(1.0f, -1.0f, 1.0f), new Vector2f(1.0f/3, 2.0f/4)), //v5
-            new Vertex(new Vector3f(1.0f, 1.0f, 1.0f), new Vector2f(1.0f/3, 3.0f/4)), //v6
-            new Vertex(new Vector3f(-1.0f, 1.0f, 1.0f), new Vector2f(0.0f, 3.0f/4)), //7
+            new Vertex(new Vector3f(-(x/2), y/2, 0.0f), new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector3f(-(x/2), -(y/2), 0.0f), new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector3f(x/2, -(y/2), 0.0f), new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector3f(x/2, y/2, 0.0f), new Vector2f(1.0f, 1.0f))
+        }, new int[] {
+            0, 1, 2,
+            0, 2, 3
+        });
+    }
 
-            new Vertex(new Vector3f(-1.0f, -1.0f, -1.0f), new Vector2f(2.0f/3, 1.0f/4)), //v8
-            new Vertex(new Vector3f(-1.0f, 1.0f, -1.0f), new Vector2f(2.0f/3, 1.0f)), //v9
-            new Vertex(new Vector3f(-1.0f, 1.0f, 1.0f), new Vector2f(1.0f/3, 1.0f)), //10
-            new Vertex(new Vector3f(-1.0f, -1.0f, 1.0f), new Vector2f(1.0f/3, 1.0f/4)), //v11
+    public Mesh cube(float x, float y, float z) {
+        return new Mesh(new Vertex[] {
+            new Vertex(new Vector3f(-(x/2), -(y/2), -(z/2)), new Vector2f(1.0f, 2.0f/4)), //v0
+            new Vertex(new Vector3f((x/2), -(y/2), -(z/2)), new Vector2f(2.0f/3, 2.0f/4)), //v1
+            new Vertex(new Vector3f((x/2), (y/2), -(z/2)), new Vector2f(2.0f/3, 3.0f/4)), //v2
+            new Vertex(new Vector3f(-(x/2), (y/2), -(z/2)), new Vector2f(1.0f, 3.0f/4)), //v3
+            new Vertex(new Vector3f(-(x/2), -(y/2), (z/2)), new Vector2f(0.0f, 2.0f/4)), //v4
+            new Vertex(new Vector3f((x/2), -(y/2), (z/2)), new Vector2f(1.0f/3, 2.0f/4)), //v5
+            new Vertex(new Vector3f((x/2), (y/2), (z/2)), new Vector2f(1.0f/3, 3.0f/4)), //v6
+            new Vertex(new Vector3f(-(x/2), (y/2), (z/2)), new Vector2f(0.0f, 3.0f/4)), //7
 
-            new Vertex(new Vector3f(-1.0f, 1.0f, -1.0f), new Vector2f(2.0f/3, 0.0f)), //v12
-            new Vertex(new Vector3f(-1.0f, 1.0f, 1.0f), new Vector2f(1.0f/3, 0.0f)) //13
+            new Vertex(new Vector3f(-(x/2), -(y/2), -(z/2)), new Vector2f(2.0f/3, 1.0f/4)), //v8
+            new Vertex(new Vector3f(-(x/2), (y/2), -(z/2)), new Vector2f(2.0f/3, 1.0f)), //v9
+            new Vertex(new Vector3f(-(x/2), (y/2), (z/2)), new Vector2f(1.0f/3, 1.0f)), //10
+            new Vertex(new Vector3f(-(x/2), -(y/2), (z/2)), new Vector2f(1.0f/3, 1.0f/4)), //v11
+
+            new Vertex(new Vector3f(-(x/2), (y/2), -(z/2)), new Vector2f(2.0f/3, 0.0f)), //v12
+            new Vertex(new Vector3f(-(x/2), (y/2), (z/2)), new Vector2f(1.0f/3, 0.0f)) //13
     }, new int[] {
             5, 2, 6,
             5, 1, 2,
@@ -171,5 +184,25 @@ public class Mesh {
             8, 13, 12,
             8, 11, 13
     });
+    }
+
+    public Mesh cylinder(float height, float radius, int res){
+        Vertex[] vList = new Vertex[2*res];
+        for (int i = 0; i < res; i++) {
+            vList[2 * i] = new Vertex(new Vector3f(Math.cos(Math.toRadians((360.0f / res) * i)), Math.sin(Math.toRadians((360.0f / res) * i)), height / 2),
+                                    new Vector2f((1.0f / res) * i, 1.0f));
+            vList[2 * i + 1] = new Vertex(new Vector3f(Math.cos(Math.toRadians((360.0f / res) * i)), Math.sin(Math.toRadians((360.0f / res) * i)), -(height / 2)),
+                                    new Vector2f((1.0f / res) * i, 0.0f));
+        }
+        int[] iList = new int[3*2*res];
+        for (int i = 0; i < res; i++) {
+            iList[6 * i] = 2 * i;
+            iList[6 * i + 1] = 2 * i + 1;
+            iList[6 * i + 2] = 2 * (i % (res + 1)) + 1;
+            iList[6 * i + 3] = 2 * i;
+            iList[6 * i + 4] = 2 * (i % (res + 1)) + 1;
+            iList[6 * i + 5] = 2 * (i % (res + 1));
+        }
+        return new Mesh(vList, iList);
     }
 }

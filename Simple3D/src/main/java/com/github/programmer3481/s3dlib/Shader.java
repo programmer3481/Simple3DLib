@@ -78,6 +78,10 @@ public class Shader {
         this(vert, frag, new Texture[] {texture});
     }
 
+    public Shader(String vert, String frag) {
+        this(vert, frag, new Texture[] {});
+    }
+
     public void destroy() {
         glDeleteProgram(programID);
     }
